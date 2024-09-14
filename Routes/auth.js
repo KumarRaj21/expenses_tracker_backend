@@ -20,20 +20,24 @@ try {
 
 //signin
 
-router.post("/login", async (req,res)=>{
+router.post("/login", async (req, res) => {
     try {
-        const user = await User.findOne({email : req.body.email})
-        if(!user){ 
-            res.status(200).json({ message : "Please Sign in First"})
-        }
-       const isPassword = bcrypt.compareSync(req.body.password, user.password)
-       if(!isPassword){
-        res.status(200).json({ message : "Password incorrect"})
-    }
-     const {password, ...others} = user._doc
-     res.status(200).json({ others })
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return res.status(400).json({ message: "Please Sign in First" });
+      }
+      
+      const isPassword = bcrypt.compareSync(req.body.password, user.password);
+      if (!isPassword) {
+        return res.status(400).json({ message: "Password incorrect" });
+      }
+      
+      const { password, ...others } = user._doc;
+      res.status(200).json({ others });
     } catch (error) {
-        res.status(200).json({ message : " User already exists"})
-     }
-})
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Something went wrong, please try again later" });
+    }
+  });
+  
 module.exports = router
